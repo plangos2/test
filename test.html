@@ -314,7 +314,7 @@
       recognition.start();
     }
 
-async function getFastAnswer(question) {
+    async function getFastAnswer(question) {
       document.getElementById('answer').innerText = "Vyhledávám odpověď...";
 
       const now = new Date();
@@ -328,7 +328,7 @@ async function getFastAnswer(question) {
             "Authorization": `Bearer ${GROQ_API_KEY}`
           },
           body: JSON.stringify({
-            model: "openai/gpt-oss-20b", // Přesné název modelu z tvého Playgroundu
+            model: "llama-3.1-8b-instant",
             messages: [
               { 
                 role: "system", 
@@ -368,7 +368,7 @@ async function getFastAnswer(question) {
         logError("Chyba sítě: " + err.message);
         document.getElementById('answer').innerText = "Chyba připojení k serveru.";
       }
-    }  
-</script>
+    }
+  </script>
 </body>
 </html>
