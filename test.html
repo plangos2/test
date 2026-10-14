@@ -314,7 +314,7 @@
       recognition.start();
     }
 
-    async function getFastAnswer(question) {
+async function getFastAnswer(question) {
       document.getElementById('answer').innerText = "Vyhledávám odpověď...";
 
       const now = new Date();
@@ -328,12 +328,11 @@
             "Authorization": `Bearer ${GROQ_API_KEY}`
           },
           body: JSON.stringify({
-            model: "llama-3.3-70b-versatile",
-            reasoning_effort: "none", // Vynutíme vypnutí přemýšlecího procesu
+            model: "llama-3.1-8b-instant", // Změněno na stabilní a rychlý model
             messages: [
               { 
                 role: "system", 
-                content: `Jsi inteligentní a moderní AI asistent. Dnešní rok je ${currentYear}. Když se uživatel ptá na věk osoby, spočítej ho přesně k tomuto roku (${currentYear}). Odpovídej věcně, srozumitelně a přehledně.` 
+                content: `Jsi inteligentní a moderní AI asistent. Dnešní rok je ${currentYear}. Když se uživatel ptá na věk osoby, spočítej ho přesně k tomuto roku (${currentYear}). Odpovídej věcně, srozumitelně a přehledně, ideálně v 1-2 větách pro hlasový výstup.` 
               },
               { role: "user", content: question }
             ],
@@ -353,18 +352,9 @@
         let reply = "";
         try {
           const msg = data.choices?.[0]?.message;
-          reply = (msg?.content || "") + (msg?.reasoning || "");
+          reply = msg?.content || "";
         } catch (e) {
           reply = "";
-        }
-
-        // Kdyby se přeci jen objevilo thinking, odřízneme ho
-        if (reply.includes("</think>")) {
-          const parts = reply.split("</think>");
-          reply = parts[parts.length - 1];
-        }
-        if (reply.includes("<think>")) {
-          reply = reply.replace(/<think>[\s\S]*?<\/think>/g, '');
         }
 
         if (reply.trim()) {
@@ -378,7 +368,7 @@
         logError("Chyba sítě: " + err.message);
         document.getElementById('answer').innerText = "Chyba připojení k serveru.";
       }
-    }
-  </script>
+    }  
+</script>
 </body>
 </html>
