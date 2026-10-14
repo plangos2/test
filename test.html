@@ -328,7 +328,7 @@ async function getFastAnswer(question) {
             "Authorization": `Bearer ${GROQ_API_KEY}`
           },
           body: JSON.stringify({
-            model: "llama-3.1-8b-instant", // Změněno na stabilní a rychlý model
+            model: "openai/gpt-oss-20b", // Přesné název modelu z tvého Playgroundu
             messages: [
               { 
                 role: "system", 
