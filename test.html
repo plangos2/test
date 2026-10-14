@@ -315,7 +315,7 @@
     }
 
     async function getFastAnswer(question) {
-      document.getElementById('answer').innerText = "Vyhledávám odpověď...";
+      document.getElementById('answer').innerText = "Vyhledávám nejrychlejší odpověď...";
 
       const now = new Date();
       const currentYear = now.getFullYear();
@@ -328,15 +328,17 @@
             "Authorization": `Bearer ${GROQ_API_KEY}`
           },
           body: JSON.stringify({
-            model: "llama3-8b-8192", // Stabilní ne-reasoning model na Groqu
+            model: "openai/gpt-oss-20b",
             messages: [
               { 
                 role: "system", 
-                content: `Jsi inteligentní a moderní AI asistent. Dnešní rok je ${currentYear}. Když se uživatel ptá na věk osoby, spočítej ho přesně k tomuto roku (${currentYear}). Odpovídej věcně, srozumitelně a přehledně, ideálně v 1-2 větách pro hlasový výstup.` 
+                content: `Jsi ultra-rychlý a přesný AI asistent pro hlasový výstup. Dnešní rok je ${currentYear}. Odpovídej extrémně stručně, věcně a přímo k věci (striktně v 1 až 2 větách), protože text bude čten nahlas nebo zobrazen. Využívej aktuální online data. Pokud nevíš, odpověz stručně.` 
               },
               { role: "user", content: question }
             ],
-            max_tokens: 200,
+            // Aktivace nativního webového vyhledávání z test2.html
+            tools: [{ type: "browser_search" }],
+            max_tokens: 150,
             temperature: 0.1
           })
         });
@@ -344,21 +346,17 @@
         const data = await response.json();
 
         if (!response.ok) {
-          logError(JSON.stringify(data, null, 2));
+          const errMsg = data.error?.message || JSON.stringify(data, null, 2);
+          logError(errMsg);
           document.getElementById('answer').innerText = "Chyba API rozhraní (zkontroluj platnost klíče).";
           return;
         }
 
-        let reply = "";
-        try {
-          const msg = data.choices?.[0]?.message;
-          reply = msg?.content || "";
-        } catch (e) {
-          reply = "";
-        }
+        // Vylepšené bezpečné parsování odpovědi
+        let botReply = data.choices?.[0]?.message?.content || "";
 
-        if (reply.trim()) {
-          let cleanReply = reply.trim().replace(/\*\*/g, '');
+        if (botReply.trim()) {
+          let cleanReply = botReply.trim().replace(/\*\*/g, '');
           document.getElementById('answer').innerText = cleanReply;
         } else {
           document.getElementById('answer').innerText = "Odpověď nenalezena.";
